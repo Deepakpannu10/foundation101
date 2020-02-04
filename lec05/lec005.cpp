@@ -14,8 +14,8 @@ void display(vector<int>& arr){
 
 
 int findMin(vector<int>& arr){
-    int mymin=arr[0];
-    for(int i=1;i<arr.size();i++){
+    int mymin=INT32_MAX;
+    for(int i=0;i<arr.size();i++){
         if(arr[i]<mymin){
             mymin = arr[i];
         }
