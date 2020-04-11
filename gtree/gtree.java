@@ -56,6 +56,18 @@ class gtree{
         return mysize;
     }
 
+    public static int height( node root ) {
+        if( root == null ){
+            return 0;
+        }
+        int myheight = 0;
+        for( int i = 0 ; i < root.child.size() ; i++ ){
+            myheight = Math.max( myheight, height( root.child.get(i) ) );
+        }
+        return myheight + 1;
+    }
+
+
 
     public static int max(node root){
         if( root == null ){
@@ -90,15 +102,61 @@ class gtree{
     }
 
 
+    public static ArrayList<Integer> n2rpath(node root,int val){
+        if( root == null ){
+            return null;
+        }
+        if( root.data == val ){
+            ArrayList<Integer> ans = new ArrayList<>();
+            ans.add(root.data);
+            return ans;
+        }
+        for( int i = 0 ; i < root.child.size() ; i++ ){
+            ArrayList<Integer> recAns =  n2rpath( root.child.get(i),val );
+            if( recAns != null ){
+                recAns.add(root.data);
+                return recAns;
+            }
+        }
+        return null;
+    }
 
 
+    public static int LCA( node root, int d1, int d2 ) {
+        ArrayList<Integer> n2rPathOfD1 = n2rpath( root, d1 );
+        ArrayList<Integer> n2rPathOfD2 = n2rpath( root, d2 );
+        int i = n2rPathOfD1.size() -1;
+        int j = n2rPathOfD2.size() -1;
+        while( i >=0 && j >=0){
+            if( n2rPathOfD1.get(i) != n2rPathOfD2.get(j) ){
+                break;
+            }
+            i--;    j--;
+        }
+        return n2rPathOfD1.get(i+1);
+    }
+    
+    public static  void displayLO( node root ) {
+        Queue<node> qu = new LinkedList<>();
+        qu.add( root );
+        while( qu.size() > 0 ){
+            node currNode = qu.remove();
+            System.out.print(currNode.data +" ");
+            for( int i = 0 ; i < currNode.child.size() ; i++ ){
+                qu.add( currNode.child.get(i) );
+            }
+        }        
+    }
 
     public static void main(String[] args) {
         int[] data = {10,20,50,-1,60,-1,-1,30,70,-1,80,110,-1,120,-1,-1,90,-1,-1,40,100};
         treeConstruct(data);
         // display(root);
-        System.out.println(find(root,95));
-
-
+        // System.out.println(find(root,95));
+        // ArrayList<Integer> ans = n2rpath(root,75);
+        // System.out.println(ans);
+        // System.out.println( LCA( root, 110, 120 ));
+        // displayLO(root);
+        System.out.println( height(root) );
     }
 }
