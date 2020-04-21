@@ -43,7 +43,6 @@ class graph{
 
 
     public static void printAllPaths( ArrayList<ArrayList<edge>> graph, int s ,int d,boolean[] visited, String psf  ) {
-        
         if( s == d ){
             psf = psf + d;
             System.out.println(psf);
@@ -57,6 +56,81 @@ class graph{
             }
         }
         visited[s] = false;
+    }
+
+    static int mincost = Integer.MAX_VALUE;
+    static int maxcost = Integer.MIN_VALUE;
+    static String minpath = "";
+    static String maxpath = "";
+
+
+    public static void longestAndShortestPaths( ArrayList<ArrayList<edge>> graph,int s,int d,boolean[] visited,String psf,int csf ){
+
+        if( s == d ){
+            psf = psf+d;
+            if( csf < mincost ){
+                mincost = csf;
+                minpath = psf;
+            }
+            if(csf > maxcost){
+                maxcost = csf;
+                maxpath = psf;
+            }
+            return;
+        }
+        visited[s] = true;
+        for( int e = 0 ; e < graph.get(s).size() ; e++ ){
+            edge ce = graph.get(s).get(e);
+            if( visited[ce.nbr] == false ){
+                longestAndShortestPaths( graph,ce.nbr,d,visited,psf+s+" -> ",csf+ce.wt );
+            }
+        }
+        visited[s] = false;
+    }
+
+    static int cCost = Integer.MAX_VALUE;
+    static int fCost = Integer.MIN_VALUE;
+    static String cPath = "";
+    static String fPath = "";
+    public static void cAndFPaths( ArrayList<ArrayList<edge>> graph,int s,int d,boolean[] visited,String psf,
+                                    int csf ,int factor){
+        if( s == d ){
+            psf = psf+d;
+            if( csf > factor ){
+                if( cCost > csf ){
+                    cCost = csf;
+                    cPath = psf;
+                }
+            }
+            if( csf < factor ){
+                if( csf > fCost ){
+                    fCost = csf;
+                    fPath = psf;
+                }
+            }
+            return;
+        }
+        visited[s] = true;
+        for( int e = 0 ; e < graph.get(s).size() ; e++ ){
+            edge ce = graph.get(s).get(e);
+            if( visited[ce.nbr] == false ){
+                cAndFPaths( graph,ce.nbr,d,visited,psf+s+" -> ",csf+ce.wt , factor);
+            }
+        }
+        visited[s] = false;
+    }
+
+
+    public static void kthLargestPath(ArrayList<ArrayList<edge>> graph,int s,int d,int k){
+        // fCost = Integer.MIN_VALUE;
+        int factor = Integer.MAX_VALUE;
+        boolean[] visited = new boolean[graph.size()];
+        for( int i = 0; i < k ; i++ ){
+            fCost = Integer.MIN_VALUE;
+            cAndFPaths(graph,s,d,visited,"",0,factor);
+            factor = fCost;
+        }
+        System.out.println( fPath +" @ " + fCost );
     }
 
 
@@ -76,6 +150,16 @@ class graph{
         // display(graph);
         boolean[] visited =  new boolean[graph.size()];
         // System.out.println( hasPath(graph,0,6,visited) );
-        printAllPaths(graph,0,6,visited,"");
+        // printAllPaths(graph,0,6,visited,"");
+        // longestAndShortestPaths(graph,0,6,visited,"",0);
+        // System.out.println( minpath +" @ " + mincost );
+        // System.out.println( maxpath +" @ " + maxcost );
+
+        // cAndFPaths(graph,0,6,visited,"",0,48);
+        // System.out.println( cPath +" @ " + cCost );
+        // System.out.println( fPath +" @ " + fCost );
+
+        kthLargestPath(graph,0,6,1);
+
     }
 }
