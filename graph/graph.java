@@ -134,6 +134,106 @@ class graph{
     }
 
 
+    public static void hamiltonianPathAndCycle( ArrayList<ArrayList<edge>> graph,int s, ArrayList<Integer> psf,
+                                                boolean[] visited, int os ) {
+        if( psf.size() == graph.size() - 1 ){
+            psf.add( s );
+            for( int i = 0 ; i < psf.size() ; i++ ){
+                System.out.print(psf.get(i)+" ");
+            }
+            boolean isCycle = false;
+            for( int e = 0 ; e < graph.get(s).size() ; e++ ){
+                edge ce = graph.get(s).get(e);
+                if( ce.nbr == os ){
+                    isCycle = true;
+                    break;
+                }
+            }
+            if( isCycle ){
+                System.out.println(".");
+            }
+            System.out.println();
+            psf.remove(psf.size()-1);
+            return;
+        }
+
+        visited[s] = true;
+        psf.add(s); // why arraylist?
+        for( int e = 0 ; e < graph.get(s).size() ; e++ ){
+            edge ce = graph.get(s).get(e);
+            if( visited[ce.nbr] == false ){
+                hamiltonianPathAndCycle(graph,ce.nbr,psf,visited,os);
+            }
+        }
+        psf.remove(psf.size() -1);
+        visited[s] = false;
+    }
+
+    public static void getComponent(ArrayList<ArrayList<edge>> graph,ArrayList<Integer> comp,boolean[] visited, int s){
+        visited[s] = true;
+        comp.add(s);
+        for( int e = 0 ; e < graph.get(s).size() ; e++ ){
+            edge ce = graph.get(s).get(e);
+            if( visited[ce.nbr] == false ){
+                getComponent(graph,comp,visited,ce.nbr);
+            }
+        }
+    }
+
+    public static int connectedComponents(  ArrayList<ArrayList<edge>> graph ){
+        boolean[] visited = new boolean[graph.size()];
+        int count = 0;
+        // ArrayList<ArrayList<Integer>> allComps = new ArrayList<>();
+         for( int v = 0 ; v < graph.size() ; v++ ){
+            if( visited[v] == false ){
+                count++;
+                ArrayList<Integer> singleComp = new ArrayList<>();
+                getComponent( graph, singleComp, visited, v );
+                System.out.println(singleComp);
+                // allComps.add(singleComp);
+            }
+        }
+        return count;
+    }
+
+    static class bfsHelper{
+        int vtx;
+        String path;
+        int cost;
+        bfsHelper( int v, String p, int c ){
+            this.vtx = v; this.path = p; this.cost = c;
+        }
+    }
+
+    public static void bfsTraversal(ArrayList<ArrayList<edge>> graph, int s){
+        Queue<bfsHelper> qu = new LinkedList<>();
+        boolean[] visited = new boolean[graph.size()];
+        qu.add( new bfsHelper(s, ""+s+" -> ",0) );
+        visited[0] = true;
+        while( qu.size() > 0 ){
+            // remove
+            bfsHelper cv = qu.remove();
+            // mark
+            // if( visited[cv.vtx] ){
+            //     continue;
+            // }else{
+            //     visited[cv.vtx] = true;
+            // }
+            // work
+            System.out.println( cv.path +" @ "+cv.cost );
+            // add nbrs
+            for( int e =  0 ; e < graph.get(cv.vtx).size() ; e++ ){
+                edge ce = graph.get(cv.vtx).get(e);
+                if( visited[ce.nbr] == false ){
+                    visited[ce.nbr] = true;
+                    qu.add( new bfsHelper( ce.nbr, cv.path + ce.nbr+" -> ",cv.cost+ce.wt) );
+                }
+            }
+        }
+    }
+
+
+
     public static void main(String[] args) {   
         ArrayList<ArrayList<edge>> graph = new ArrayList<>();
         for( int i = 0 ; i <= 6 ; i++ ){
@@ -143,6 +243,7 @@ class graph{
         addEdge(graph,0,3,40);
         addEdge(graph,1,2,10);
         addEdge(graph,2,3,10);
+        // addEdge(graph,2,5,20);   // for hamiltonian cycle. 
         addEdge(graph,3,4,2);
         addEdge(graph,4,5,3);
         addEdge(graph,5,6,3);
@@ -159,7 +260,10 @@ class graph{
         // System.out.println( cPath +" @ " + cCost );
         // System.out.println( fPath +" @ " + fCost );
 
-        kthLargestPath(graph,0,6,1);
-
+        // kthLargestPath(graph,0,6,1);
+        // hamiltonianPathAndCycle( graph,0,new ArrayList<Integer>(),visited,0 );
+        // int comps = connectedComponents( graph );
+        // System.out.println(comps);
+        bfsTraversal(graph, 0);
     }
 }
