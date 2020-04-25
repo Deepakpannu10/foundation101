@@ -196,12 +196,15 @@ class graph{
         return count;
     }
 
-    static class bfsHelper{
+    static class bfsHelper implements Comparable<bfsHelper>{
         int vtx;
         String path;
         int cost;
         bfsHelper( int v, String p, int c ){
             this.vtx = v; this.path = p; this.cost = c;
+        }
+        public int compareTo( bfsHelper other ){
+                return this.cost - other.cost;
         }
     }
 
@@ -232,6 +235,76 @@ class graph{
         }
     }
 
+    public static void dijkstra(ArrayList<ArrayList<edge>> graph,int s){
+        PriorityQueue<bfsHelper> pq = new PriorityQueue<>();
+        //PriorityQueue<bfsHelper> pq = new PriorityQueue<>(Collections.reverseOrder());  max priorityQueue
+        boolean[] visited = new boolean[graph.size()];
+        bfsHelper root = new bfsHelper( s, ""+s,0 );
+        pq.add( root );
+        while( pq.size() > 0 ){
+            // remove
+            bfsHelper cv = pq.remove();
+            // mark
+            if( visited[cv.vtx] == true ){
+                continue;
+            }else{
+                visited[cv.vtx] = true;
+            }
+            // work
+            System.out.println( cv.path + " @ " + cv.cost );
+            for( int i = 0; i <graph.get( cv.vtx ).size() ; i++ ){
+                edge ce = graph.get( cv.vtx ).get(i);
+                if( visited[ ce.nbr ] == false ){
+                    bfsHelper newvtx = new bfsHelper( ce.nbr, cv.path +"->" +ce.nbr , cv.cost + ce.wt );
+                    pq.add( newvtx );
+                }
+            }
+        }
+    }
+
+    static class primsHelper implements Comparable<primsHelper>{
+        int vtx;
+        int par;
+        int wt;
+        primsHelper( int v, int p, int dis ){
+            vtx = v; par = p; wt = dis;
+        }
+        public int compareTo( primsHelper other){
+            return this.wt - other.wt;
+        }
+    }
+    public static void primsMST(ArrayList<ArrayList<edge>> graph){
+        ArrayList<ArrayList<edge>> mst = new ArrayList<>();
+        for( int i = 0 ; i < graph.size() ; i++ ){
+            mst.add( new ArrayList<edge>() );
+        }
+        PriorityQueue<primsHelper> pq = new PriorityQueue<>();
+        primsHelper rootNode = new primsHelper(2, -1 , 0  );
+        pq.add( rootNode );
+        boolean[] visited = new boolean[graph.size()];
+        while( pq.size() > 0 ){
+            primsHelper cv = pq.remove();
+            // mark
+            if( visited[cv.vtx] == true ){
+                continue;
+            }else{
+                visited[cv.vtx] = true;
+            }
+            // work
+            if( cv.par != -1 ){
+                   addEdge( mst, cv.vtx, cv.par, cv.wt  );
+            }
+            // add nbrs
+            for( int i = 0; i <graph.get( cv.vtx ).size() ; i++ ){
+                edge ce = graph.get( cv.vtx ).get(i);
+                if( visited[ ce.nbr ] == false ){
+                    primsHelper newvtx = new primsHelper(ce.nbr, cv.vtx, ce.wt );
+                    pq.add( newvtx );
+                }
+            }
+        }
+        display( mst );
+    }
 
 
     public static void main(String[] args) {   
@@ -243,11 +316,12 @@ class graph{
         addEdge(graph,0,3,40);
         addEdge(graph,1,2,10);
         addEdge(graph,2,3,10);
-        // addEdge(graph,2,5,20);   // for hamiltonian cycle. 
+        addEdge(graph,2,5,5);   // for hamiltonian cycle. 
         addEdge(graph,3,4,2);
         addEdge(graph,4,5,3);
         addEdge(graph,5,6,3);
         addEdge(graph,4,6,8);
+        addEdge(graph,0,6,30);
         // display(graph);
         boolean[] visited =  new boolean[graph.size()];
         // System.out.println( hasPath(graph,0,6,visited) );
@@ -264,6 +338,8 @@ class graph{
         // hamiltonianPathAndCycle( graph,0,new ArrayList<Integer>(),visited,0 );
         // int comps = connectedComponents( graph );
         // System.out.println(comps);
-        bfsTraversal(graph, 0);
+        // bfsTraversal(graph, 0);
+        // dijkstra( graph,0 );
+        primsMST(graph);
     }
 }
